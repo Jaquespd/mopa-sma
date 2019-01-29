@@ -1,0 +1,71 @@
+.content__sidebar {
+  display: flex;
+  transition: left .3s ease;
+  width: 100vw;
+  
+  position: fixed;
+  top: $header-height;
+  left: -100vw;
+  bottom: 0;
+  z-index: 1;
+
+  @include desktop {
+    display: flex;
+    padding-right: $large-space;
+    position: static;
+    width: $page-content-sidebar-width;
+  }
+}
+
+.is-nav-open .content__sidebar {
+  left: 0;
+}
+
+.item-list {
+  background-color: white;
+  border: 1px solid grey;
+  // overflow-y: scroll;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.item-list-button {
+  background-color: white;
+  // border: 1px solid $grey;
+  // overflow-y: scroll;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+.item {
+  border-left: $item-border-width solid transparent;
+  cursor: pointer;
+  padding: $space;
+  transition: background-color .3s ease, border-left .3s ease;
+}
+
+.item:hover {
+  background-color: $light-grey;
+  border-left: $item-border-width solid gray;
+}
+
+.item--selected, .item--selected:hover {
+  background-color: $light-grey;
+  border-left: $item-border-width solid $brand-primary;
+}
+
+.item__title {
+  font-weight: normal;
+  font-size: $base-font-size;
+  margin-bottom: .4rem;
+}
+
+.item--selected .item__title {
+  font-weight: bold;
+}
+
+.item__subtitle {
+  color: $dark-grey;
+  margin: 0;
+}

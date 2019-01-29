@@ -1,0 +1,855 @@
+$(function() {
+    $(".tabs .tab-list").tabs(".panes__content", {
+        current: 'active',
+        tabs: '.tab-item'
+    });
+
+    // INIT REMOVE EMEDIATE BANNER WHEN SCREEN SIZE IS BELOW 1024PX
+    removeEmediateBannerBelow1024px();
+
+    //TOOLTIP PHONE VALIDATED
+    $('.item.phone .validate-phone').tooltip({
+        tipClass: 'module_tooltip',
+        delay: 0,
+        offset: [-7, -10]
+    });
+
+    //LIGHTBOX
+    $('.OLXad-finance-insurance .link[rel]').overlay({
+        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+        fixed: false,
+        onLoad: function() {
+            //Focus accessibility
+            this.getOverlay().attr("aria-hidden", "false");
+            $(".site_main").attr("tabindex", "-1");
+            //New focus
+            this.getOverlay().find(".title").first().attr("tabindex", "0").focus();
+        },
+        onClose: function() {
+            //RemoveFocus accessibility
+            this.getOverlay().attr("aria-hidden", "true");
+            $(".site_main").removeAttr("tabindex");
+            this.getTrigger().focus();
+        }
+    });
+
+    var t_ad_id = $('.OLXad-id').find('.description').text();
+    var c_ad_id = getCookie('t_ad_id');
+    if (t_ad_id == c_ad_id) {
+        $('#adreply_body').val(getCookie('t_msg'));
+        deleteCookie('t_ad_id');
+        deleteCookie('t_msg');
+    }
+
+    //LIGHTBOX A/B TEST
+    $('.btn-login-sidebar[rel]').overlay({
+        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+        fixed: false,
+        onLoad: function() {
+            var ad_id = $('.OLXad-id').find('.description').text();
+            var msg = $('#adreply_body').val();
+            var domain_redirect = $('#domain_redirect').val().split("//")[1].split(":")[0];
+            setCookie('t_ad_id', ad_id);
+            setCookie('t_msg', msg);
+            setCookie('t_url', window.location.href, 6353, '/', domain_redirect, false);
+        }
+    });
+
+    $('.item.gallery .more-info[rel], .bn-direto .more-info[rel]').overlay({
+        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+        fixed: false,
+        onLoad: function() {
+            //Focus accessibility
+            this.getOverlay().attr("aria-hidden", "false");
+            $(".site_main").attr("tabindex", "-1");
+            //New focus
+            this.getOverlay().find(".title").first().attr("tabindex", "0").focus();
+        },
+        onClose: function() {
+            //RemoveFocus accessibility
+            this.getOverlay().attr("aria-hidden", "true");
+            $(".site_main").removeAttr("tabindex");
+            this.getTrigger().focus();
+        }
+    });
+
+    //LEADS LIGHTBOX
+    $('.OLXad-leads .btn-cotar-agora[rel]').overlay({
+        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+        fixed: false,
+        onLoad: function() {
+            //Focus accessibility
+            this.getOverlay().attr("aria-hidden", "false");
+            $(".site_main").attr("tabindex", "-1");
+            //New focus
+            this.getOverlay().find(".img").first().attr("tabindex", "0").focus();
+        },
+        onClose: function() {
+            //RemoveFocus accessibility
+            this.getOverlay().attr("aria-hidden", "true");
+            $(".site_main").removeAttr("tabindex");
+            this.getTrigger().focus();
+        }
+    });
+
+    //ADD SHARE EMAIL LIGHTBOX
+    $('.social-share .icon.email[rel]').overlay({
+        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+        fixed: false,
+        onLoad: function() {
+            //Focus accessibility
+            this.getOverlay().attr("aria-hidden", "false");
+            $(".site_main").attr("tabindex", "-1");
+            //New focus
+            this.getOverlay().find(".title").first().attr("tabindex", "0").focus();
+        },
+        onClose: function() {
+            $('.lb-share .form-share-email').show();
+            $('.lb-share .form-validation.form-validation-success').hide();
+            //RemoveFocus accessibility
+            this.getOverlay().attr("aria-hidden", "true");
+            $(".site_main").removeAttr("tabindex");
+            this.getTrigger().focus();
+        }
+    });
+
+    //RANDOMIZE PARTNERS FOR INSURANCE LIGHTBOX
+    $('.OLXad-finance-insurance .item .link:first').click(function() {
+        $('div.lb-insurance ul.list li.company').shuffle();
+    });
+
+    // CALL AD REPLY
+    $('.site_sidebar').contactEmail();
+
+    // CALL SHARE BY EMAIL
+    $('.item.social-share').shareEmail();
+
+    // CALL SCARFACE
+    $('.item.denounce.control').reportAd();
+
+
+    $('.section_scarface .btn-close').click(function() {
+        var validation_msg = $('.section_scarface .form-validation');
+        var scf_sent = $('.section_OLXad-options #scf_sent');
+        validation_msg.addClass('hidden').removeClass('form-validation-error, form-validator-success');
+        scf_sent.addClass('hidden');
+        toggle_denounce(false);
+    });
+
+    /* [TO DO] remove this after change to OLX */
+    /*
+    //CALL SPLIT ADPARAMS LIST FUNCTION
+    var adparams =  $('.OLXad-details .atributes .item').length;
+    var services = $('.OLXad-details_section .field_atributes').hasClass('services');
+
+    if(adparams > 1 && !services)
+        split_ul('.OLXad-details .atributes .list')
+    else if(adparams > 1 && services)
+        split_ul('.OLXad-details .atributes.services .list .item .list');
+
+    */
+
+    /* BEGIN PREMIUM ACCOUNT ADS GALLERY */
+    $(".section_more-OLXads-of-seller .scrollable").scrollable({
+        disabledClass: "hidden",
+        speed: 400,
+        prev: ".scroll-prev",
+        next: ".scroll-next",
+        size: 3,
+        vertical: true,
+        keyboard: false,
+        circular: true
+    });
+
+    /* END PREMIUM ACCOUNT ADS GALLERY */
+    $('.section_map-location .link_map-location').click(function() {
+        $(this).addClass("hidden");
+        $(".section_map-location #map").removeClass("hidden");
+    });
+});
+
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+        var pair = vars[i].split("=");
+        if (pair[0] == variable) {
+            return pair[1];
+        }
+    }
+    return -1;
+}
+//RANDOMIZE DOM ELEMENTS FUNCTION
+(function($) {
+
+    $.fn.shuffle = function() {
+
+        var allElems = this.get(),
+            getRandom = function(max) {
+                return Math.floor(Math.random() * max);
+            },
+            shuffled = $.map(allElems, function() {
+                var random = getRandom(allElems.length),
+                    randEl = $(allElems[random]).clone(true)[0];
+                allElems.splice(random, 1);
+                return randEl;
+            });
+
+        this.each(function(i) {
+            $(this).replaceWith($(shuffled[i]));
+        });
+
+        return $(shuffled);
+    };
+
+})(jQuery);
+
+$(document).ready(function() {
+    var domain_redirect = $('#domain_redirect').val().split("//")[1].split(":")[0];
+    deleteCookie('t_url', '/', domain_redirect);
+
+    register_events(jsevents.vi, document);
+
+    // If there is a fav parameter on URL, adds the ad to user's favorites on page load
+    $(window).load(function() {
+        if (window.location.search.indexOf("fav=1") != -1) {
+            var el = $('#save_ad');
+            if (el) {
+                el.get(0).scrollIntoView();
+                favorite_ad(template_vars.list_id);
+            }
+        }
+    });
+    $("#hidden_phone").show();
+    $("#show_phone").click(function() {
+        $("#hidden_phone").hide();
+        $("#visible_phone").show();
+        try {
+            // Redis SHOW_PHONE counter
+            $.post("/show_phone", { list_id: template_vars.list_id });
+
+            // Xiti
+            xt_click(this, 'C', xtn2, 'ad_reply_phone_web', 'A');
+
+            // Google Tag Manager
+            if (!(typeof dataLayer === "undefined")) {
+                dataLayer.push({ event: "show_phone" });
+            }
+        } catch (err) {};
+    });
+
+    $(".show_phone").click(function() {
+        var phone = $(this).parents(".phone");
+        $(phone).find(".hidden_phone").hide();
+        $(phone).find(".visible_phone").show();
+        try {
+            // Redis SHOW_PHONE counter
+            $.post("/show_phone", { list_id: template_vars.list_id });
+
+            // Xiti
+            xt_click(this, 'C', xtn2, 'ad_reply_phone_web', 'A');
+
+            // Google Tag Manager
+            if (!(typeof dataLayer === "undefined")) {
+                dataLayer.push({ event: "show_phone" });
+            }
+        } catch (err) {};
+    });
+
+   $('.OLXad-description .phone .hidden_phone').parent('.phone').each(function(index, item) {
+        var phoneVal = $(item).find('.visible_phone').text()
+        var shortText = jQuery.trim(phoneVal).substring(0, 4);
+        $(item).find('.hidden_phone').text(shortText + $(item).find('.hidden_phone').text())
+        $(item).find('.hidden_phone').attr('data-lurker_last_bump_age_secs', dataLayer[0].page.detail.last_bump_age_secs)
+    })
+
+});
+
+//SPLIT  ADPARAMS LIST -- based on code from http://goo.gl/ZoIMoQ
+function split_ul(ulist) {
+    var arr_params = new Array(),
+        $list_params = $(ulist);
+
+    $list_params.find('li').each(function() {
+        arr_params.push($(this).html());
+    })
+
+    var firstList = arr_params.splice(0, Math.round(arr_params.length / 2));
+    var secondList = arr_params
+    var ListHTML = '';
+
+    // POPULATE ADPARAMS LIST
+    function populate_list(list) {
+
+        ListHTML = '';
+        for (var i = 0; i < list.length; i++) {
+            ListHTML += '<li class="item">' + list[i] + '</li>'
+        };
+    }
+
+    populate_list(firstList);
+    $list_params.html(ListHTML);
+
+    populate_list(secondList);
+    $list_params.after('<ul class="list square-gray last"></ul>').next().html(ListHTML);
+}
+
+function show_favorite_msg(success, msg) {
+    var el = $('.msg_save');
+    if (success) {
+        if (el.data('success-msg')) {
+            el.html(el.data('success-msg'));
+        }
+    } else {
+        el.removeClass('form-validation-success').addClass('form-validation-error').data('success-msg', el.html());
+        el.html(msg);
+    }
+
+    if (el.hasClass('hidden')) {
+        el.removeClass('hidden');
+    }
+}
+
+function favorite_click_xiti() {
+    var tag = 'Add_favorites_clicks::' + friendlycategory[template_vars.category].pt + '::' + friendlystate[template_vars.state].pt + '::' + template_vars.region;
+    xt_click(this, 'C', xtn2, tag, 'N');
+}
+
+function favorite_ad(id) {
+    var sendData = {
+        'favorite_item': id
+    };
+    var url = VI_vars['account_url'] + "favorites_add";
+    $.ajax({
+        "type": "GET",
+        "jsonpCallback": 'jsonpCallback',
+        "url": url,
+        "data": sendData,
+        "dataType": "jsonp"
+    }).done(function(result) {
+        var message = $('<div />').html(result['message']).text();
+        show_favorite_msg(result['success'], message);
+        if (result['success']) {
+            var el = $('#save_ad');
+            var tag = 'Add_favorites::' + friendlycategory[template_vars.category].pt + '::' + friendlystate[template_vars.state].pt + '::' + template_vars.region;
+            xt_click(this, 'C', xtn2, tag, 'N');
+        }
+    }).fail(function(result) {
+        show_favorite_msg(false, 'Seu anúncio não pôde ser salvo. Tente novamente em alguns instantes.');
+    });
+}
+
+// SOCIAL SHARE FOR TWITTER
+function open_twitter(param) {
+    window.open('https://twitter.com/share?text=' + param, 'twitter_popup', 'width=640, height=480');
+    return false;
+}
+
+// SOCIAL SHARE FOR FACEBOOK
+function open_facebook(param) {
+    window.open('https://www.facebook.com/sharer.php?t=&u=' + param, 'facebook_popup', 'width=640, height=340');
+    return false;
+}
+
+// REMOVE EMEDIATE BANNER WHEN SCREEN SIZE IS BELOW 1024PX
+function removeEmediateBannerBelow1024px() {
+    var windowWidth = $(window).width();
+    minWindowWidth = 1009;
+    if (windowWidth < minWindowWidth) {
+        $('.banner-vi-out-right').removeClass('emediate');
+    }
+}
+
+function toggle_denounce(open) {
+    var list_id = VI_vars['list_id'];
+    var form_denounce = $('.section_scarface .form-denounce .form');
+    var validation_msg = $('.section_scarface .form-validation');
+    var msg_save = $('.section_OLXad-options .msg_save');
+    var scf_sent = $('.section_OLXad-options #scf_sent');
+    var denounced_ad = get_denounce(list_id);
+    validation_msg.addClass('hidden').removeClass('form-validation-error, form-validator-success');
+    scf_sent.addClass('hidden');
+    form_denounce.remove();
+    if (!msg_save.hasClass('hidden')) msg_save.addClass('hidden');
+    if (typeof(open) == 'undefined') {
+        $('.section_scarface, .item.denounce').toggleClass('opened');
+    } else {
+        if (open) {
+            $('.section_scarface, .item.denounce').addClass('opened');
+            $('.denounce').removeClass('close');
+        } else {
+            $('.section_scarface, .item.denounce').removeClass('opened');
+            $('.denounce').addClass('close');
+        }
+    }
+}
+
+(function($) {
+
+    // SCARFACE
+    $.fn.reportAd = function(options) {
+        var list_id = VI_vars['list_id'];
+        var settings = $.extend({
+            openEl: $('.denounce-link', this)
+        }, options);
+
+        var wrapperEl = $('.section_scarface, .item.denounce'),
+            formEl = $('form', wrapperEl),
+            denounce_section = $('.denounce');
+
+        return this.each(function() {
+            settings.openEl.click(function() {
+                var form_denounce = $('.section_scarface .form-denounce .form');
+                var validation_msg = $('.section_scarface .form-validation');
+                var msg_save = $('.section_OLXad-options .msg_save');
+                var denounced_ad = get_denounce(list_id);
+                var scf_sent = $('.section_OLXad-options #scf_sent');
+                validation_msg.addClass('hidden').removeClass('form-validation-error, form-validator-success');
+                scf_sent.addClass('hidden');
+                form_denounce.remove();
+                if (!msg_save.hasClass('hidden')) msg_save.addClass('hidden');
+                if (denounced_ad) {
+                    var msg = scf_sent.data('msg');
+                    msg = msg.replace('__REASON__', denounced_ad.abuse_label.toLowerCase());
+                    msg = msg.replace('__LINK__', '<a class="link" onclick="rem_denounce(' + list_id + ');toggle_denounce(true);">clique aqui</a>');
+                    scf_sent.html(msg);
+                    scf_sent.removeClass('hidden');
+                } else {
+                    wrapperEl.toggleClass('opened');
+                    denounce_section.removeClass('close');
+                }
+            });
+        });
+    }
+
+    // SHARE BY E-MAIL
+    $.fn.shareEmail = function(options) {
+        var settings = $.extend({
+            formWrapperEl: $('.form-share-email')
+        }, options);
+
+        var formEl = $('form', settings.formWrapperEl);
+
+        return this.each(function() {
+
+
+            formEl.submit(function(e) {
+                e.preventDefault();
+
+                $('.form-validation', formEl).hide();
+
+                $.post(formEl.attr('action'), formEl.serializeArray(), function(data) {
+                    if (data) {
+                        var dataObj = {};
+
+                        $.each(data.split(';'), function(k, v) {
+                            var a = v.split(':');
+                            dataObj[a[0]] = a[1];
+                        });
+
+                        if (dataObj.Status && dataObj.Status == 'TRANS_OK') {
+                            $('#share_success').html('O an&uacute;ncio foi enviado com sucesso').show();
+                            xt_click(this, 'C', xtn2, 'share_by_mail');
+                            settings.formWrapperEl.hide();
+                        } else {
+                            $.each(dataObj, function(k, v) {
+                                $('#err_tip_' + k, formEl).text(v).show();
+                            });
+                        }
+
+                    };
+                });
+            });
+
+        });
+    };
+
+    // AD REPLY
+    $.fn.contactEmail = function() {
+
+        var formEl = $('#arform, #arform1, #arform2');
+
+        return this.each(function() {
+
+            formEl.submit(function(e) {
+                e.preventDefault();
+                var $this = $(e.target);
+
+                var $successContainer = $('.ar_success', e.target);
+                $successContainer.hide();
+                if (!$this.data('validator').all_validators_ok()) return false;
+
+                var formData = $this.serializeArray();
+                $('.form-validation', $this).hide();
+                $(':submit', $this).attr('disabled', true);
+
+                $.ajax({
+                    url: "/send_ar", //$this.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    dataType: 'json',
+                    complete: function() {
+                        $(':submit', $this).removeAttr('disabled');
+                    },
+                    success: function(data) {
+
+                        if (data.status == 'OK') {
+                            $successContainer.text('E-mail enviado com sucesso!').show();
+
+                            if ($("#arform").data("logged")) { // If logged
+                                var $thisName = $('[name="name"', $this),
+                                    $thisEmail = $('[name="email"]', $this),
+                                    $thisPhone = $('[name="phone"]', $this),
+                                    user_info = {
+                                        name: $thisName.val(),
+                                        email: $thisEmail.val(),
+                                        phone: $thisPhone.val()
+                                    };
+                                $this[0].reset();
+                                $thisName.val(user_info.name);
+                                $thisEmail.val(user_info.email);
+                                $thisPhone.val(user_info.phone);
+                            } else {
+                                $this[0].reset();
+                            }
+
+                            // xiti tag
+                            xt_click(this, 'F', xtn2_ar, 'adreply_sent');
+
+                            if (!(typeof dataLayer === "undefined"))
+                                dataLayer.push({ event: 'adreply' })
+                        } else {
+                            $.each(data, function(i, val) {
+                                $('[name="' + i + '"]', $this).nextAll('.form-validation').first().text(val).addClass('form-validation-error').show();
+                            });
+                        }
+                    }
+                });
+
+                try {
+                    var tag = "ad_reply_button::" + friendlycategory[$this.data('category')].pt + "::" + friendlystate[$this.data('state')].pt + "::" + $this.data('region');
+                    xt_click(this, 'C', xtn2_ar, tag, 'A');
+                } catch (err) {}
+            });
+
+        });
+    };
+})(jQuery);
+
+var abuse_validator = null;
+$("div#form_denounce").ready(function() {
+    abuse_validator = new Validator(val_conf_vi.abuse_form);
+});
+$(function() {
+    $('#arform').data('validator', new Validator(val_conf_vi.arform, '#arform'));
+    $('#arform1').data('validator', new Validator(val_conf_vi.arform, '#arform1'));
+    $('#arform2').data('validator', new Validator(val_conf_vi.arform, '#arform2'));
+});
+
+function get_denounces_cache() {
+    var denounced_ads = getCookie('denounced_ads');
+    denounced_ads = denounced_ads ? denounced_ads : '[]';
+    try {
+        denounced_ads = JSON.parse(denounced_ads);
+        denounced_ads = denounced_ads.push ? denounced_ads : [];
+    } catch (err) {
+        denounced_ads = [];
+    }
+    return denounced_ads;
+}
+
+function get_denounce_idx(list_id) {
+    var denounced_ads = get_denounces_cache();
+    var idx = -1;
+    for (var dad_idx = 0; dad_idx < denounced_ads.length; dad_idx++) {
+        var dad = denounced_ads[dad_idx];
+        if (dad.list_id == list_id.toString())
+            idx = dad_idx;
+    }
+    return idx;
+}
+
+function get_denounce(list_id) {
+    var denounced_ads = get_denounces_cache();
+    var denounced_ad_idx = get_denounce_idx(list_id);
+    var denounced_ad = (denounced_ad_idx >= 0) ? denounced_ads[denounced_ad_idx] : null;
+    return denounced_ad;
+}
+
+function add_denounce(abuse_label, list_id) {
+    var denounced_ads = get_denounces_cache();
+    denounced_ads.push({ abuse_label: abuse_label, list_id: list_id.toString() });
+    setCookie('denounced_ads', JSON.stringify(denounced_ads));
+    return denounced_ads;
+}
+
+function rem_denounce(list_id) {
+    var denounced_ads = get_denounces_cache();
+    var idx = get_denounce_idx(list_id);
+    if (idx >= 0) {
+        denounced_ads.splice(idx, 1);
+        setCookie('denounced_ads', denounced_ads);
+    }
+    return denounced_ads;
+}
+
+if (document.getElementById('captcha') != null) {
+    var captcha_enabled = true;
+    var captcha_id = 0;
+} else {
+    var captcha_enabled = false;
+}
+
+function updateabusereport(url, list_id, abuse_type, report_id) {
+
+    if (!abuse_validator.all_validators_ok()) {
+        return;
+    }
+
+    var reporter_id = getCookie("uid");
+    var email = $("#abuse_email").val();
+    var message = $("#abuse_message").val();
+
+    if (window.captcha_enabled) {
+        try {
+            var recaptcha_response = grecaptcha.getResponse(window.captcha_id);
+        } catch (err) {
+            console.log("Widget not displayed yet");
+        } finally {
+            if (!recaptcha_response) {
+                $("#captcha-error").remove();
+                $(".g-recaptcha").append("<p id='captcha-error' class='form-validation form-validation-error'>Favor utilizar o Captcha</p>");
+                return;
+            }
+        }
+    }
+
+    message = message.replace(/\n/g, "<br>");
+    var sendData = {
+        'id': list_id,
+        'abuse_type': abuse_type,
+        'abuse_message': message
+    };
+
+    if (window.captcha_enabled) {
+        sendData['g-recaptcha-response'] = recaptcha_response;
+    }
+
+    if (reporter_id && typeof reporter_id !== 'undefined' && reporter_id.match(/^\d{1,50}$/)) {
+        sendData['uid'] = reporter_id;
+    }
+    if (report_id && report_id.match(/^\d{1,50}$/)) {
+        sendData['report_id'] = report_id;
+    }
+    if (email) {
+        sendData['email'] = email;
+    }
+    $.ajax({
+        "type": "POST",
+        "url": url,
+        "data": sendData,
+        "dataType": "json",
+        cache: false
+    }).done(function(data) {
+        if (data.error == "ERRO_CAPTCHA") {
+            $(".g-recaptcha").append("<p class='form-validation form-validation-error'>O Captcha enviado não é válido!</p>");
+            grecaptcha.reset();
+            return;
+        }
+        var result = data;
+        var layer = $('.form-denounce');
+        var denounce_section = $('.denounce');
+        var form_denounce = $('.form-denounce .form');
+        denounce_section.addClass('close');
+        layer.append('<p class="form-validation form-validation-success scf">Obrigado! Sua denúncia foi enviada com sucesso.</p>');
+        delete abuse_validator;
+        var abuse_label = ($('#abuse_label').length > 0) ? $('#abuse_label').val() : 'Denúncia';
+        if (reporter_id != data.uid) {
+            var expiration_time = 10 * 365 * 24 * 60 * 60;
+            setCookie("uid", data.uid, expiration_time, "/", cookie_domain);
+        }
+        form_denounce.remove();
+        rem_denounce(template_vars.list_id);
+        add_denounce(abuse_label, template_vars.list_id);
+        abuse_validator = new Validator(val_conf_vi.abuse_form);
+
+    }).fail(function(data) {
+        if (window.captcha_enabled) {
+            grecaptcha.reset();
+        }
+        var denounce_section = $('.denounce');
+        denounce_section.addClass('close');
+        var layer = $('.form-denounce');
+    });
+}
+
+var remove_captcha_error = function(response) {
+    $("#captcha-error").remove();
+}
+
+function get_abuse_form(url, list_id, abuse_type) {
+    var sendData = {
+        'id': list_id,
+        'abuse_type': abuse_type
+    };
+
+    $.ajax({
+        "type": "GET",
+        "url": url,
+        "data": sendData,
+        "dataType": "html",
+        cache: false
+    }).done(function(result) {
+        var layer = $('.form-denounce');
+        var denounce_section = $('.denounce');
+        var form_denounce = $('.form-denounce .form');
+        denounce_section.addClass('close');
+        $('#abuse_type').remove();
+        $('#abuse_label').remove();
+        form_denounce.remove();
+        layer.append(result);
+        abuse_validator = new Validator(val_conf_vi.abuse_form);
+        if (document.getElementById('captcha') != null) {
+            window.captcha_enabled = true;
+            window.captcha_id = 0;
+            window.captcha_id = grecaptcha.render('captcha', {
+                sitekey: $('#captcha').data("sitekey"),
+                callback: remove_captcha_error
+            });
+        } else {
+            window.captcha_enabled = false;
+        }
+    }).fail(function(data) {
+        var denounce_section = $('.denounce');
+        denounce_section.addClass('close');
+        var layer = $('.form-denounce');
+        layer.append('<div><span class="error">Error</span></div>');
+    });
+}
+
+$(document).ready(function() {
+
+    var data = {
+        list_id: template_vars.list_id,
+        xiti_xtn2: blocket.xiti_xtn2
+    };
+    if (template_vars.last) {
+        $.extend(data, { last: template_vars.last });
+    }
+    if (template_vars.next_error) {
+        $.extend(data, { next_error: template_vars.next_error });
+    }
+    if (document.referrer) {
+        var ref = document.referrer.toLowerCase();
+        $.extend(data, { real_referrer: ref });
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/account_vi.html",
+        data: data,
+        dataType: "json"
+    }).done(function(data, textStatus, jqXHR) {
+        try {
+            $forms = $('#arform, #arform1, #arform2');
+            if (data["nickname"]) {
+                $("#arform").data("logged", true);
+                $forms.find('[name="name"]').val(data.nickname);
+            }
+            if (data["email"]) {
+                $forms.find('[name="email"]').val(data.email);
+            }
+            if (data["phone_number"]) {
+                $forms.find('[name="phone"]').val(data.phone_number);
+            }
+            if (data["save_ad_content"]) {
+                $("#item-denounce").before(data["save_ad_content"]);
+                if (data["email"] && data["email"] !== "") {
+                    $('#save_ad').click(function(e) {
+                        e.preventDefault();
+                        $('.section_scarface, .item.denounce').removeClass('opened');
+                        favorite_ad(template_vars.list_id);
+                        favorite_click_xiti();
+                    });
+                } else {
+                    //SAVE AD CONFIRM LIGHTBOX
+                    $('.section_OLXad-options .item.save .link[rel]').overlay({
+                        mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+                        fixed: false,
+                        onLoad: function() {
+                            //Focus accessibility
+                            this.getOverlay().attr("aria-hidden", "false");
+                            $(".site_main").attr("tabindex", "-1");
+                            //New focus
+                            this.getOverlay().find(".title").first().attr("tabindex", "0").focus();
+                        },
+                        onClose: function() {
+                            //RemoveFocus accessibility
+                            this.getOverlay().attr("aria-hidden", "true");
+                            $(".site_main").removeAttr("tabindex");
+                            this.getTrigger().focus();
+                        }
+                    });
+                }
+            }
+
+            if (data["ad_options_content"]) {
+                $("#section_ad-actions").append(data["ad_options_content"]);
+            }
+
+            var $optionsContent = $('.section_OLXad-management');
+            if ($optionsContent.length) {
+                $optionsContent.find('.module_lightbox').find('.top-price .highlight').html('R$ ' + template_vars.bump_price.replace('.', ','));
+            }
+
+            if (data["nav_result_next"]) {
+                $("#nav_result_next").replaceWith(data["nav_result_next"]);
+                var next_ad = $("#next_ad");
+                if (next_ad.length > 0) {
+                    var href = next_ad.attr("href");
+                    var indexof = href.indexOf("?");
+                    var cleaned_sq = indexof ? href.substring(indexof) : "";
+                    next_ad.attr("href", document.location.protocol + "//" + document.location.host + document.location.pathname + cleaned_sq);
+                }
+            }
+
+            $('.section_OLXad-management .show-products[rel]').overlay({
+                mask: { color: '#000', loadSpeed: 200, opacity: 0.6 },
+                fixed: false,
+                onLoad: function() {
+                    //Focus accessibility
+                    this.getOverlay().attr("aria-hidden", "false");
+                    $(".site_main").attr("tabindex", "-1");
+                    //New focus
+                    this.getOverlay().find(".title").first().attr("tabindex", "0").focus();
+                },
+                onClose: function() {
+                    //RemoveFocus accessibility
+                    this.getOverlay().attr("aria-hidden", "true");
+                    $(".site_main").removeAttr("tabindex");
+                    this.getTrigger().focus();
+                }
+            });
+        } catch (err) {}
+    }).fail(function(jqXHR, textStatus, errorThrown) {});
+
+    var t_ad_id = $('.OLXad-id').find('.description').text();
+    var c_ad_id = getCookie('t_ad_id');
+    if (t_ad_id == c_ad_id) {
+        $('#adreply_body').val(getCookie('t_msg'));
+        deleteCookie('t_ad_id');
+        deleteCookie('t_msg');
+    }
+});
+
+//Recommendation
+
+var script_rec = document.createElement("script");
+
+$('head').append('<link rel="stylesheet" type="text/css" href="//static.olx.com.br/cd/rec/rec-panel/css/main.90ff7620.css">');
+script_rec.src = '//static.olx.com.br/cd/rec/rec-panel/js/main.1cd28030.js';
+ 
+script_rec.setAttribute('defer','');
+script_rec.setAttribute('async','');
+
+setTimeout(document.body.appendChild(script_rec), 500);
